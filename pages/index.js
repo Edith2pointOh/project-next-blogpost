@@ -1,5 +1,7 @@
 import Head from 'next/head'
 import Parser from 'rss-parser'
+import Link from 'next/link'
+
 
 
 const Home = (props) => (
@@ -43,10 +45,9 @@ const Home = (props) => (
                         </tr>
                       </thead>
                       <tbody className='bg-white'>
-                        console.log(props);
+                    
                         {props.posts
-                        
-                          .sort((a, b) => new Date(b.date) - new Date(a.date))
+                        .sort((a, b) => new Date(b.date) - new Date(a.date))
                           .map((value, index) => {
                             return (
                               <tr key={index}>
@@ -89,45 +90,17 @@ const Home = (props) => (
 export async function getStaticProps(context) {
   const parser = new Parser()
 
-  const Airtable = require('airtable')
-  const base = new Airtable({ apiKey: process.env.APIKEY }).base(
-    'appYOURBASEID'
-  )
-
-  const records = await base('Table 1')
-    .select({
-      view: 'Grid view',
-    })
-    .firstPage()
-
-  const feeds = records
-    .filter((record) => {
-      if (record.get('approved') === true) return true
-    })
-    .map((record) => {
-      return {
-        id: record.id,
-        name: record.get('name'),
-        blogurl: record.get('blogurl'),
-        feedurl: record.get('feedurl'),
-      }
-    })
+  const data = await parser.parseURL('https://flaviocopes.com/index.xml')
 
   const posts = []
-
-  for (const feed of feeds) {
-    console.log(feed.feedurl)
-    const data = await parser.parseURL(feed.feedurl)
-
-    data.items.slice(0, 10).forEach((item) => {
-      posts.push({
-        title: item.title,
-        link: item.link,
-        date: item.isoDate,
-        name: feed.name,
-      })
+  data.items.slice(0, 10).forEach((item) => {
+    posts.push({
+      title: item.title,
+      link: item.link,
+      date: item.isoDate,
+      name: 'Flavio Copes'
     })
-  }
+  })
 
   return {
     props: {
