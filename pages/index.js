@@ -23,6 +23,13 @@ const Home = (props) => (
             <h1 className='text-3xl font-bold leading-tight text-gray-900'>
               Latest posts
             </h1>
+            <p>
+              <Link href='/form'>
+                <p className='underline cursor-pointer mt-2'>
+                  <a>Add a new blog</a>
+                </p>
+              </Link>
+            </p>
           </div>
         </div>
       </header>
@@ -87,20 +94,52 @@ const Home = (props) => (
 
 )
 
+// This is my api key
+// APIKEY=keyHmuzaw5HTRkcTY yarn dev
+
+
 export async function getStaticProps(context) {
   const parser = new Parser()
 
-  const data = await parser.parseURL('https://flaviocopes.com/index.xml')
+  const Airtable = require('airtable')
+  const base = new Airtable({ apiKey: process.env.APIKEY }).base(
+    'appDf7dfVJQvyUIRu'
+  )
+
+  const records = await base('Table 1')
+    .select({
+      view: 'Grid view',
+    })
+    .firstPage()
+
+  const feeds = records
+    .filter((record) => {
+      if (record.get('approved') === true) return true
+    })
+    .map((record) => {
+      return {
+        id: record.id,
+        name: record.get('name'),
+        blogurl: record.get('blogurl'),
+        feedurl: record.get('feedurl'),
+      }
+    })
 
   const posts = []
-  data.items.slice(0, 10).forEach((item) => {
-    posts.push({
-      title: item.title,
-      link: item.link,
-      date: item.isoDate,
-      name: 'Flavio Copes'
+
+  for (const feed of feeds) {
+    // console.log(feed.feedurl)
+    const data = await parser.parseURL(feed.feedurl)
+    console.log(data)
+    data.items.slice(0, 10).forEach((item) => {
+      posts.push({
+        title: item.title,
+        link: item.link,
+        date: item.isoDate,
+        name: feed.name,
+      })
     })
-  })
+  }
 
   return {
     props: {
