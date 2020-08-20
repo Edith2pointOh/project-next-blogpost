@@ -1,3 +1,5 @@
+A coding blog aggregator using Next.js, React, Airtable and tailwind CSS- with the ability for using a submit blogs via a form. Just for fun.
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
